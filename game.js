@@ -8,24 +8,28 @@ const game = {
     canvas: document.createElement("canvas"),
     
     start: function(width, height, fps) {  
+        // Configure and insert canvas:
         this.canvas.width = width;
         this.canvas.height = height;
         this.context = this.canvas.getContext("2d");
         document.body.insertBefore(this.canvas, document.body.childNodes[0]);
 
-        // Mouse:
+        // Mouse and touch events:
         this.mousePos = new Vector2D(0, 0);
-        this.canvas.addEventListener("mousemove", function(event){
-            game.updateMousePos(event);
+        this.canvas.addEventListener("mousemove", function(event){ game.updateMousePos(event.clientX, event.clientY); });
+        this.canvas.addEventListener("touchmove", function(event){
+            const touch = event.targetTouches[0]
+            game.updateMousePos(touch.pageX, touch.pageY); 
         });
 
+        // Set refresh rate:
         this.interval = setInterval(tick, 1000 / fps);
         setup()
     },
 
-    updateMousePos: function(event){
-        let rect = this.canvas.getBoundingClientRect();
-        this.mousePos.set(event.clientX - rect.left, event.clientY - rect.top);
+    updateMousePos: function(absoluteX, absoluteY){
+        const rect = this.canvas.getBoundingClientRect();
+        this.mousePos.set(absoluteX - rect.left, absoluteY - rect.top);
     },
 
     clear: function(){
