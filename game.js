@@ -1,6 +1,6 @@
 
 function startGame(){
-    game.start(500, 500, 60)
+    game.start(500, 500, 50)
 }
 
 const game = {
@@ -22,7 +22,7 @@ const game = {
             game.updateMousePos(touch.pageX, touch.pageY); 
         });
 
-        // Set refresh rate:
+        // Set frame rate:
         this.interval = setInterval(tick, 1000 / fps);
         setup()
     },
