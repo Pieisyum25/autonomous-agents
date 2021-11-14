@@ -1,64 +1,74 @@
 
 function startGame(){
-    game.start(500, 500, 50)
-}
 
-const game = {
-
-    canvas: document.createElement("canvas"),
-    
-    start: function(width, height, fps) {  
-        // Configure and insert canvas:
-        this.canvas.width = width;
-        this.canvas.height = height;
-        this.context = this.canvas.getContext("2d");
-        document.body.insertBefore(this.canvas, document.body.childNodes[0]);
-
-        // Mouse and touch events:
-        this.mousePos = new Vector2D(0, 0);
-        this.canvas.addEventListener("mousemove", function(event){ game.updateMousePos(event.clientX, event.clientY); });
-        this.canvas.addEventListener("touchmove", function(event){
-            const touch = event.targetTouches[0]
-            game.updateMousePos(touch.pageX, touch.pageY); 
-        });
-
-        // Set frame rate:
-        this.interval = setInterval(tick, 1000 / fps);
-        setup()
-    },
-
-    updateMousePos: function(absoluteX, absoluteY){
-        const rect = this.canvas.getBoundingClientRect();
-        this.mousePos.set(absoluteX - rect.left, absoluteY - rect.top);
-    },
-
-    clear: function(){
-        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height)
+    for (let i = 0; i < 2; i++){
+        new Game(
+            new Vector2D(500, 500),
+            50,
+            function(){
+                this.vehicle = new Vehicle(100, 100);
+                this.target = this.mousePos;
+            },
+            function(){
+                const steering = this.vehicle.seek(this.target);
+                this.vehicle.applyForce(steering);
+                this.vehicle.update();
+            },
+            function(){
+                this.vehicle.draw(this.context);
+                this.context.fillRect(this.target.x, this.target.y, 10, 10);
+            }
+        )
     }
 }
 
-function tick(){
-    game.clear();
-    update();
-    draw(game.context);
-}
+class Game {
 
 
-let vehicle;
-let target;
+    constructor(size, fps, setup, update, draw){
+        this.size = size;
+        this.canvas = document.createElement("canvas");
+        this.canvas.width = size.x;
+        this.canvas.height = size.y;
+        document.body.appendChild(this.canvas);
 
-function setup(){
-    vehicle = new Vehicle(100, 100);
-    target = game.mousePos;
-}
+        const self = this;
+        this.canvas.addEventListener("mousemove", function(event){ 
+            self.updateMousePos(event.clientX, event.clientY); 
+        });
+        this.canvas.addEventListener("touchmove", function(event){
+            const touch = event.targetTouches[0];
+            self.updateMousePos(touch.pageX, touch.pageY); 
+        });
+        this.mousePos = new Vector2D(0, 0);
+        this.canvasRect = this.canvas.getBoundingClientRect();
+        this.context = this.canvas.getContext("2d");
 
-function update(){
-    let steering = vehicle.seek(target);
-    vehicle.applyForce(steering);
-    vehicle.update();
-}
+        // Set up callbacks:
+        this.update = update;
+        this.draw = draw;
 
-function draw(c){
-    vehicle.draw(c);
-    c.fillRect(target.x, target.y, 10, 10);
+        // Start game:
+        this.setup = setup;
+        this.setup();
+        
+        // Set frame rate:
+        this.interval = setInterval(function(){ self.tick(self) }, 1000 / fps);        
+    }
+
+    updateMousePos(absoluteX, absoluteY){
+        this.mousePos.set(absoluteX - this.canvasRect.left, absoluteY - this.canvasRect.top);
+    }
+
+    clearCanvas(){
+        this.context.clearRect(0, 0, this.size.x, this.size.y);
+    }
+
+    tick(self){
+        self.clearCanvas();
+        self.update();
+        self.draw();
+    }
+
+
 }

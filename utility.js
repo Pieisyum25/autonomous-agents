@@ -58,6 +58,8 @@ class Vector2D {
 
     direction(){ return Math.atan2(this.y, this.x); }
 
+    copy(){ return new Vector2D(this.x, this.y); }
+
     toString(){ return "(" + this.x + ", " + this.y + ")"; }
 
     static add(a, b){ return new Vector2D(a.x + b.x, a.y + b.y); }
