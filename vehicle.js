@@ -100,6 +100,10 @@ class Vehicle {
         c.translate(-this.pos.x, -this.pos.y);
     }
 
+    toString(){
+        return "Vehicle "+this.id+": "+this.pos.toString();
+    }
+
 }
 
 
