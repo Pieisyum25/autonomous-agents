@@ -6,30 +6,28 @@ function addSeekAndFleeGames(){
         this.target = this.mousePos;
     }
 
+    const update = function(){
+        const steering = (this.id == 1)? this.vehicle.seek(this.target) : this.vehicle.flee(this.target);
+        this.vehicle.applyForce(steering);
+        this.vehicle.update(this.size);
+    }
+
     const draw = function(){
         this.vehicle.draw(this.context);
         this.context.fillRect(this.target.x, this.target.y, 10, 10);
     }
 
     for (let i = 0; i < 2; i++){
-        new Game(
-            new Vector2D(500, 500),
-            50,
-            setup,
-            function(){
-                const steering = (i == 0)? this.vehicle.seek(this.target) : this.vehicle.flee(this.target);
-                this.vehicle.applyForce(steering);
-                this.vehicle.update(this.size);
-            },
-            draw
-        )
+        new Game(new Vector2D(500, 500), 50, setup, update, draw);
     }    
 }
 
 class Game {
 
+    static count = 1;
 
     constructor(size, fps, setup, update, draw){
+        this.id = Game.count++;
         this.size = size;
         this.canvas = document.createElement("canvas");
         this.canvas.width = size.x;
