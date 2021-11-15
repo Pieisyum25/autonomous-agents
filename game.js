@@ -2,7 +2,7 @@
 function addSeekAndFleeGames(){
 
     const setup = function(){
-        this.vehicle = new Vehicle(100, 100, 20);
+        this.vehicle = new Vehicle(100, 100, 20, Vehicle.BorderBehaviour.BOUNCE);
         this.target = this.mousePos;
     }
 
