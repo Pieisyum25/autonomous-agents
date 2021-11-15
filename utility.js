@@ -1,7 +1,36 @@
 
+// Shape functions:
+
+function rectangle(context, left, top, width, height){
+    with (context){
+        fillRect(left, top, width, height);
+        strokeRect(left, top, width, height);
+    }
+}
+
+function triangle(context, x0, y0, x1, y1, x2, y2){
+    with (context){
+        beginPath();
+        moveTo(x0, y0);
+        lineTo(x1, y1);
+        lineTo(x2, y2);
+        closePath();
+        fill();
+        stroke();
+    }
+}
+
+function circle(context, centreX, centreY, radius){
+    with (context){
+        beginPath();
+        arc(centreX, centreY, radius, 0, 2 * Math.PI);
+        fill();
+        stroke();
+    }
+}
+
 
 class Vector2D {
-
 
     constructor(x, y){
         this.x = x;

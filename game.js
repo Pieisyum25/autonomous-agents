@@ -14,7 +14,9 @@ function addSeekAndFleeGames(){
 
     const draw = function(){
         this.vehicle.draw(this.context);
-        this.context.fillRect(this.target.x, this.target.y, 10, 10);
+        this.context.fillStyle = "red";
+        this.context.strokeStyle = "maroon";
+        circle(this.context, this.mousePos.x, this.mousePos.y, 10);
     }
 
     for (let i = 0; i < 2; i++){

@@ -65,19 +65,14 @@ class Vehicle {
     }
 
     draw(c){
-        c.fillStyle = "black";
         c.translate(this.pos.x, this.pos.y);
         let dir = this.vel.direction()
         c.rotate(dir);
 
-        //c.fillRect(0, 0, this.radius, this.radius);
-
-        c.beginPath();
-        c.moveTo(-this.radius, -this.radius/2);
-        c.lineTo(-this.radius, this.radius/2);
-        c.lineTo(this.radius, 0);
-        c.fill();
-
+        c.fillStyle = "red";
+        c.strokeStyle = "maroon";
+        triangle(c, -this.radius, -this.radius/2, -this.radius, this.radius/2, this.radius, 0);
+        
         c.rotate(-dir);
         c.translate(-this.pos.x, -this.pos.y);
     }
