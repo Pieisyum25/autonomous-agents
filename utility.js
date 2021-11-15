@@ -14,6 +14,30 @@ class Vector2D {
         return this;
     }
 
+    setX(x){
+        this.x = x;
+        return this;
+    }
+
+    setY(y){
+        this.y = y;
+        return this;
+    }
+
+    invert(){
+        return this.mul(-1);
+    }
+
+    invertX(){
+        this.x *= -1;
+        return this;
+    }
+
+    invertY(){
+        this.y *= -1;
+        return this;
+    }
+
     add(vector){
         this.x += vector.x;
         this.y += vector.y;
@@ -33,7 +57,7 @@ class Vector2D {
     }
 
     div(scalar){
-        let reciprocal = 1 / scalar;
+        const reciprocal = 1 / scalar;
         return this.mul(reciprocal);
     }
 
@@ -52,7 +76,7 @@ class Vector2D {
     }
 
     unit(){
-        let m = this.getMag();
+        const m = this.getMag();
         return this.div(m)
     }
 

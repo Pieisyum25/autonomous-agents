@@ -2,13 +2,16 @@
 
 class Vehicle {
 
-    constructor(x, y) {
-        this.pos = new Vector2D(x, y);
+    static count = 1;
+
+    constructor(x, y, radius) {
+        this.id = Vehicle.count++;
+        this.pos = new Vector2D(x + radius, y + radius);
         this.vel = new Vector2D(0, 0);
         this.acc = new Vector2D(0, 0);
         this.maxSpeed = 15;
         this.maxForce = 0.5;
-        this.radius = 16;
+        this.radius = radius;
     }
 
     seek(target){
@@ -25,11 +28,40 @@ class Vehicle {
 
     applyForce(force){ this.acc.add(force); }
 
-    update(){
+    applyBorder(canvasSize){
+        const left = this.pos.x - this.radius;
+        const top = this.pos.y - this.radius;
+        const right = this.pos.x + this.radius;
+        const bottom = this.pos.y + this.radius;
+
+        if (left <= 0){
+            this.pos.setX(this.radius);
+            this.vel.invertX();
+            this.vel.mul(0.8);
+        } 
+        else if (right >= canvasSize.x){
+            this.pos.setX(canvasSize.x - this.radius);
+            this.vel.invertX();
+            this.vel.mul(0.8);
+        }
+        if (top <= 0){
+            this.pos.setY(this.radius);
+            this.vel.invertY();
+            this.vel.mul(0.8);
+        }
+        else if (bottom >= canvasSize.y){
+            this.pos.setY(canvasSize.y - this.radius);
+            this.vel.invertY();
+            this.vel.mul(0.8);
+        }
+    }
+
+    update(canvasSize){
         this.vel.add(this.acc);
         this.vel.limitMag(this.maxSpeed);
         this.pos.add(this.vel);
         this.acc.set(0, 0);
+        this.applyBorder(canvasSize);
     }
 
     draw(c){
