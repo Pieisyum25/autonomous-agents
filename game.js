@@ -19,7 +19,7 @@ function addSeekAndFleeGames(){
     }
 
     for (let i = 0; i < 2; i++){
-        new Game(new Vector2D(500, 500), 50, setup, update, draw);
+        new Game(new Vector2D(500, 500), 50, setup, update, draw, (i == 0)? "seek" : "flee");
     }    
 }
 
@@ -27,14 +27,14 @@ class Game {
 
     static count = 1;
 
-    constructor(size, fps, setup, update, draw){
+    constructor(size, fps, setup, update, draw, containerId){
         const self = this;
         this.id = Game.count++;
         this.size = size;
         this.canvas = document.createElement("canvas");
         this.canvas.width = size.x;
         this.canvas.height = size.y;
-        document.body.appendChild(this.canvas);
+        document.getElementById(containerId).appendChild(this.canvas);
         this.context = this.canvas.getContext("2d");
 
         // Set up callbacks:
@@ -54,7 +54,6 @@ class Game {
         const self = this;
         this.mousePos = new Vector2D(-1, -1);
         this.mouseOver = false;
-        this.canvasRect = this.canvas.getBoundingClientRect();
 
         // Keep track of whether the mouse/touch is currently on the canvas:
         this.canvas.addEventListener("mouseout", function(event){ self.mousePos.set(-1, -1); });
@@ -62,16 +61,17 @@ class Game {
 
         // Keep track of mouse/touch position:
         this.canvas.addEventListener("mousemove", function(event){ 
-            self.updateMousePos(event.clientX, event.clientY); 
+            self.updateMousePos(event.offsetX, event.offsetY); 
         });
         this.canvas.addEventListener("touchmove", function(event){
             const touch = event.targetTouches[0];
-            self.updateMousePos(touch.pageX, touch.pageY); 
+            const rect = self.canvas.getBoundingClientRect();
+            self.updateMousePos(touch.clientX - rect.left, touch.clientY - rect.top); 
         });
     }
 
     updateMousePos(absoluteX, absoluteY){
-        this.mousePos.set(absoluteX - this.canvasRect.left, absoluteY - this.canvasRect.top);
+        this.mousePos.set(absoluteX, absoluteY);
     }
 
     clearCanvas(){
