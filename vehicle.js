@@ -89,7 +89,7 @@ class Vehicle {
 
     draw(c){
         c.translate(this.pos.x, this.pos.y);
-        let dir = this.vel.direction()
+        const dir = this.vel.direction()
         c.rotate(dir);
 
         c.fillStyle = "red";
@@ -100,4 +100,33 @@ class Vehicle {
         c.translate(-this.pos.x, -this.pos.y);
     }
 
+}
+
+
+
+class Target extends Vehicle {
+
+    constructor(x, y, radius, speedX, speedY){
+        super(x, y, radius, Vehicle.BorderBehaviour.WRAP);
+        this.defaultVel = new Vector2D(speedX, speedY);
+    }
+
+    update(canvasSize, mousePos){
+        // If mouse on canvas, move target towards mouse pos:
+        if (mousePos.x != -1) this.vel = Vector2D.sub(mousePos, this.pos).mul(0.2);
+        // Else make target travel at default velocity:
+        else this.vel = this.defaultVel;
+
+        super.update(canvasSize);
+    }
+
+    draw(c){
+        c.translate(this.pos.x, this.pos.y);
+
+        c.fillStyle = "red";
+        c.strokeStyle = "maroon";
+        circle(c, 0, 0, this.radius);
+
+        c.translate(-this.pos.x, -this.pos.y);
+    }
 }
