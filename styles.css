@@ -71,7 +71,7 @@ main {
     box-shadow: 0 0 40px #fff ;
 }
 
-.main_title {
+main h1 {
     font-size: 45px;
     text-decoration: underline;
 }
