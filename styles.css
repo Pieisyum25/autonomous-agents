@@ -7,8 +7,26 @@ html {
     box-sizing: inherit;
 }
 
+body {
+    background-color: #990000;
+    word-wrap: break-word;
+    color: #fff;
+}
+
+main {
+    background-color: #500000;
+    margin: 50px auto 100px;
+    max-width: 75%;
+    display: block;
+    overflow: auto;
+    padding: 50px 5% 100px;
+    box-shadow: 0 0 40px #fff ;
+}
+
 canvas {
     border: 1px solid #d3d3d3;
     background-color: #250000;
     touch-action: none;
+    display: block;
+    margin: auto;
 }
