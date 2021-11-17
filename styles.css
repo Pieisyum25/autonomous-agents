@@ -58,7 +58,6 @@ nav {
 
 .nav_link {
     white-space: nowrap;
-    color: inherit;
     text-decoration: none;
 }
 
@@ -84,6 +83,11 @@ canvas {
     display: inherit;
     margin: auto;
 }
+
+a:link { color: yellow; }
+a:visited { color: orange; }
+a:active { color: red; }
+a:hover { text-decoration: underline; }
 
 h1 {
     text-align: center;
