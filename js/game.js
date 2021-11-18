@@ -34,25 +34,19 @@ function insertSeekAndFleeGames(){
 function insertPursueAndEvadeGames(){
 
     const setup = function(){
-        this.vehicles = [];
-        this.vehicles.push(new Vehicle(100 * i, 100 * i, 20, Vehicle.BorderBehaviour.BOUNCE));
+        this.vehicle = new Vehicle(100, 100, 20, Vehicle.BorderBehaviour.BOUNCE);
         this.target = new Target(this.size.x / 2, this.size.y / 2, 10, 6, 2);
     }
 
     const update = function(){
-        this.vehicles.forEach(vehicle => {
-            const steering = (this.id == 1)? vehicle.pursue(this.target, this.context) : vehicle.evade(this.target, this.context);
-            vehicle.applyForce(steering);
-            vehicle.update(this.size);
-        });
-        
+        const steering = (this.id == 1)? this.vehicle.pursue(this.target, this.context) : this.vehicle.evade(this.target, this.context);
+        this.vehicle.applyForce(steering);
+        this.vehicle.update(this.size);
         this.target.update(this.size, this.mousePos);
     }
 
     const draw = function(){
-        this.vehicles.forEach(vehicle => {
-            vehicle.draw(this.context);
-        });
+        this.vehicle.draw(this.context);
         this.target.draw(this.context);
     }
 
