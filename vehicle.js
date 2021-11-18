@@ -42,6 +42,7 @@ class Vehicle {
         if (c !== undefined){
             c.fillStyle = "yellow";
             c.strokeStyle = "orange";
+            line(c, target.pos.x, target.pos.y, posPrediction.x, posPrediction.y);
             circle(c, posPrediction.x, posPrediction.y, 5);
         }
 

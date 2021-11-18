@@ -1,6 +1,15 @@
 
 // Shape functions:
 
+function line(context, x0, y0, x1, y1){
+    with (context){
+        beginPath();
+        moveTo(x0, y0);
+        lineTo(x1, y1);
+        stroke();
+    }
+}
+
 function rectangle(context, left, top, width, height){
     with (context){
         fillRect(left, top, width, height);

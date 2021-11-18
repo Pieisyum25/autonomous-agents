@@ -36,7 +36,7 @@ function insertPursueAndEvadeGames(){
     const setup = function(){
         this.vehicles = [];
         for (let i = 1; i <= 1; i++) this.vehicles.push(new Vehicle(100 * i, 100 * i, 20, Vehicle.BorderBehaviour.BOUNCE));
-        this.target = new Target(this.size.x / 2, this.size.y / 2, 10, 4, 1);
+        this.target = new Target(this.size.x / 2, this.size.y / 2, 10, 6, 2);
     }
 
     const update = function(){
