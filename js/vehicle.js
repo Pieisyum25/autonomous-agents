@@ -60,6 +60,22 @@ class Vehicle {
         return this.pursue(target, c).invert();
     }
 
+    arrive(targetPos){
+        const force = Vector2D.sub(targetPos, this.pos);
+        const slowRadius = 0.5 * this.maxSpeed * (this.maxSpeed / this.maxForce + 1);
+        const distance = force.getMag();
+        if (distance < slowRadius){
+            const desiredSpeed = map(distance, 0, slowRadius, 0, this.maxSpeed);
+            force.setMag(desiredSpeed);
+        }
+        else {
+            force.setMag(this.maxSpeed);
+        }
+        force.sub(this.vel);
+        force.limitMag(this.maxForce);
+        return force;
+    }
+
     applyForce(force){ this.acc.add(force); }
 
     applyBorder(canvasSize){

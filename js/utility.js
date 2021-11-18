@@ -1,5 +1,5 @@
 
-// Shape functions:
+// Shape Functions:
 
 function line(context, x0, y0, x1, y1){
     with (context){
@@ -38,6 +38,28 @@ function circle(context, centreX, centreY, radius){
     }
 }
 
+
+// Utility Functions:
+
+function map(value, oldMin, oldMax, newMin, newMax){
+    if (value <= oldMin) return newMin;
+    if (value >= oldMax) return newMax;
+    const progress = (value - oldMin) / (oldMax - oldMin);
+    return interpolate(progress, newMin, newMax);
+}
+
+function interpolate(progress, min, max){
+    if (progress <= 0) return min;
+    if (progress >= 1) return max;
+    return min + (progress * (max - min));
+}
+
+function rand(min, max){
+    return (Math.random() * (max - min)) + min;
+}
+
+
+// Vector2D:
 
 class Vector2D {
 

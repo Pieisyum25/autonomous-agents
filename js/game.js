@@ -35,7 +35,7 @@ function insertPursueAndEvadeGames(){
 
     const setup = function(){
         this.vehicles = [];
-        for (let i = 1; i <= 1; i++) this.vehicles.push(new Vehicle(100 * i, 100 * i, 20, Vehicle.BorderBehaviour.BOUNCE));
+        this.vehicles.push(new Vehicle(100 * i, 100 * i, 20, Vehicle.BorderBehaviour.BOUNCE));
         this.target = new Target(this.size.x / 2, this.size.y / 2, 10, 6, 2);
     }
 
@@ -61,6 +61,32 @@ function insertPursueAndEvadeGames(){
     }    
 }
 
+
+function insertArriveGame(){
+    const setup = function(){
+        this.vehicle = new Vehicle(100, 100, 20, Vehicle.BorderBehaviour.BOUNCE);
+        this.target = new Target(this.size.x / 2, this.size.y / 2, 10, 0, 0);
+    }
+
+    const update = function(){
+        const steering = this.vehicle.arrive(this.target.pos);
+        this.vehicle.applyForce(steering);
+        this.vehicle.update(this.size);
+        this.target.update(this.size, this.mousePos);
+
+        if (Vector2D.distanceSquared(this.vehicle.pos, this.target.pos) < 1){
+            const r = this.vehicle.radius;
+            this.target.pos.set(rand(r, this.canvas.width - r), rand(r, this.canvas.height - r));
+        }
+    }
+
+    const draw = function(){
+        this.vehicle.draw(this.context);
+        this.target.draw(this.context);
+    }
+
+    new Game(new Vector2D(500, 500), 50, setup, update, draw, "arrive");
+}
 
 
 class Game {
