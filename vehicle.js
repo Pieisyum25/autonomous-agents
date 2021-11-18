@@ -15,22 +15,37 @@ class Vehicle {
         this.pos = new Vector2D(x + radius, y + radius);
         this.vel = new Vector2D(0, 0);
         this.acc = new Vector2D(0, 0);
-        this.maxSpeed = 15;
-        this.maxForce = 0.5;
+        this.maxSpeed = 10;
+        this.maxForce = 0.3;
         this.radius = radius;
         this.borderBehaviour = borderBehaviour;
     }
 
-    seek(target){
-        let force = Vector2D.sub(target, this.pos);
+    seek(targetPos){
+        const force = Vector2D.sub(targetPos, this.pos);
         force.setMag(this.maxSpeed);
         force.sub(this.vel);
         force.limitMag(this.maxForce);
         return force;
     }
 
-    flee(target){
-        return this.seek(target).mul(-1);
+    flee(targetPos){
+        return this.seek(targetPos).mul(-1);
+    }
+
+    pursue(target, c){
+        const distance = 0.1 * Vector2D.distance(this.pos, target.pos);
+        const movePrediction = target.vel.copy().mul(distance);
+        const posPrediction = Vector2D.add(target.pos, movePrediction);
+
+        // Draw predicted position of target:
+        if (c !== undefined){
+            c.fillStyle = "yellow";
+            c.strokeStyle = "orange";
+            circle(c, posPrediction.x, posPrediction.y, 5);
+        }
+
+        return this.seek(posPrediction);
     }
 
     applyForce(force){ this.acc.add(force); }

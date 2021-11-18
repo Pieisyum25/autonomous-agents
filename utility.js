@@ -118,6 +118,9 @@ class Vector2D {
     static add(a, b){ return new Vector2D(a.x + b.x, a.y + b.y); }
     static sub(a, b){ return new Vector2D(a.x - b.x, a.y - b.y); }
 
+    static distanceSquared(a, b){ return Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2); }
+    static distance(a, b){ return Math.sqrt(this.distanceSquared(a, b)); }
+
     static dotProduct(a, b){ return ((a.x * b.x) + (a.y * b.y)); }
 
     static get ZERO(){ return ZERO; }
