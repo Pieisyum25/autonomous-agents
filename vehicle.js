@@ -41,8 +41,8 @@ class Vehicle {
         const posPrediction = Vector2D.add(target.pos, movePrediction);
 
         // Increase the length between the target and its future position prediction proportionate to
-        // how off the vehicle's current velocity is from max velocity towards the target:
-        const velComponent = 0.03 * (this.maxSpeed - this.vel.projectionScalar(Vector2D.sub(posPrediction, this.pos)));
+        // how off the vehicle's current velocity is from the target's velocity:
+        const velComponent = 0.1 * Vector2D.sub(target.vel, this.vel).getMag();
         posPrediction.add(Vector2D.mul(target.vel, velComponent));
 
         // Draw predicted position of target:
