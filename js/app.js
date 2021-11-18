@@ -6,7 +6,7 @@ function insertHeader(){
 
     const icon = document.createElement("img");
     icon.classList.add("header_icon");
-    icon.src = "cat_tile.png";
+    icon.src = "img/cat_tile.png";
     header.appendChild(icon);
 
     const text = document.createElement("div");
