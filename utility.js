@@ -118,6 +118,19 @@ class Vector2D {
         return this.div(m)
     }
 
+    projectionVector(vector){
+        const dotProduct = Vector2D.dotProduct(this, vector);
+        const vMag = vector.getMag();
+        const factor = dotProduct / Math.pow(vMag, 2);
+        return Vector2D.mul(vector, factor);
+    }
+
+    projectionScalar(vector){
+        const dotProduct = Vector2D.dotProduct(this, vector);
+        const vMag = vector.getMag();
+        return dotProduct / vMag;
+    }
+
     direction(){ return Math.atan2(this.y, this.x); }
 
     copy(){ return new Vector2D(this.x, this.y); }
@@ -126,6 +139,11 @@ class Vector2D {
 
     static add(a, b){ return new Vector2D(a.x + b.x, a.y + b.y); }
     static sub(a, b){ return new Vector2D(a.x - b.x, a.y - b.y); }
+    static mul(a, b){ return new Vector2D(a.x * b, a.y * b); }
+    static div(a, b){ 
+        const reciprocal = 1 / b;
+        return Vector2D.mul(a, reciprocal);
+    }
 
     static distanceSquared(a, b){ return Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2); }
     static distance(a, b){ return Math.sqrt(this.distanceSquared(a, b)); }

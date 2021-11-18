@@ -30,13 +30,20 @@ class Vehicle {
     }
 
     flee(targetPos){
-        return this.seek(targetPos).mul(-1);
+        return this.seek(targetPos).invert();
     }
 
     pursue(target, c){
-        const distance = 0.1 * Vector2D.distance(this.pos, target.pos);
-        const movePrediction = target.vel.copy().mul(distance);
+        // Increase the length between the target and its future position prediction proportionate to
+        // the distance of the vehicle from the target:
+        const distComponent = 0.07 * Vector2D.distance(this.pos, target.pos);
+        const movePrediction = Vector2D.mul(target.vel, distComponent);
         const posPrediction = Vector2D.add(target.pos, movePrediction);
+
+        // Increase the length between the target and its future position prediction proportionate to
+        // how off the vehicle's current velocity is from max velocity towards the target:
+        const velComponent = 0.03 * (this.maxSpeed - this.vel.projectionScalar(Vector2D.sub(posPrediction, this.pos)));
+        posPrediction.add(Vector2D.mul(target.vel, velComponent));
 
         // Draw predicted position of target:
         if (c !== undefined){
@@ -47,6 +54,10 @@ class Vehicle {
         }
 
         return this.seek(posPrediction);
+    }
+
+    evade(target, c){
+        return this.pursue(target, c).invert();
     }
 
     applyForce(force){ this.acc.add(force); }
@@ -133,7 +144,7 @@ class Target extends Vehicle {
 
     update(canvasSize, mousePos){
         // If mouse on canvas, move target towards mouse pos:
-        if (mousePos.x != -1) this.vel = Vector2D.sub(mousePos, this.pos).mul(0.2);
+        if (mousePos.x != -1) this.vel = Vector2D.sub(mousePos, this.pos).mul(0.5);
         // Else make target travel at default velocity:
         else this.vel = this.defaultVel;
 

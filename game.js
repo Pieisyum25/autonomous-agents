@@ -41,7 +41,7 @@ function insertPursueAndEvadeGames(){
 
     const update = function(){
         this.vehicles.forEach(vehicle => {
-            const steering = (this.id == 1)? vehicle.pursue(this.target, this.context) : vehicle.flee(this.target.pos);
+            const steering = (this.id == 1)? vehicle.pursue(this.target, this.context) : vehicle.evade(this.target, this.context);
             vehicle.applyForce(steering);
             vehicle.update(this.size);
         });
