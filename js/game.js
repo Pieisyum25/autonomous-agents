@@ -69,7 +69,7 @@ function insertArriveGame(){
         this.target.update(this.size, this.mousePos);
 
         if (Vector2D.distanceSquared(this.vehicle.pos, this.target.pos) < 1){
-            const r = this.vehicle.radius;
+            const r = max(this.vehicle.radius, this.target.radius);
             this.target.pos.set(rand(r, this.canvas.width - r), rand(r, this.canvas.height - r));
         }
     }

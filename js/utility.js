@@ -41,6 +41,14 @@ function circle(context, centreX, centreY, radius){
 
 // Utility Functions:
 
+function min(a, b){
+    return (a < b)? a : b;
+}
+
+function max(a, b){
+    return (a > b)? a : b;
+}
+
 function map(value, oldMin, oldMax, newMin, newMax){
     if (value <= oldMin) return newMin;
     if (value >= oldMax) return newMax;

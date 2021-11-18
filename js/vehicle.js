@@ -21,9 +21,17 @@ class Vehicle {
         this.borderBehaviour = borderBehaviour;
     }
 
-    seek(targetPos){
+    seek(targetPos, arrival = false){
         const force = Vector2D.sub(targetPos, this.pos);
-        force.setMag(this.maxSpeed);
+        let desiredSpeed = this.maxSpeed;
+
+        // If doing arrival, slow down when near target:
+        if (arrival){
+            const slowRadius = 0.5 * this.maxSpeed * (this.maxSpeed / this.maxForce + 1);
+            const distance = force.getMag();
+            if (distance < slowRadius) desiredSpeed = map(distance, 0, slowRadius, 0, this.maxSpeed);
+        }
+        force.setMag(desiredSpeed);
         force.sub(this.vel);
         force.limitMag(this.maxForce);
         return force;
@@ -61,20 +69,10 @@ class Vehicle {
     }
 
     arrive(targetPos){
-        const force = Vector2D.sub(targetPos, this.pos);
-        const slowRadius = 0.5 * this.maxSpeed * (this.maxSpeed / this.maxForce + 1);
-        const distance = force.getMag();
-        if (distance < slowRadius){
-            const desiredSpeed = map(distance, 0, slowRadius, 0, this.maxSpeed);
-            force.setMag(desiredSpeed);
-        }
-        else {
-            force.setMag(this.maxSpeed);
-        }
-        force.sub(this.vel);
-        force.limitMag(this.maxForce);
-        return force;
+        return this.seek(targetPos, true);
     }
+
+
 
     applyForce(force){ this.acc.add(force); }
 
