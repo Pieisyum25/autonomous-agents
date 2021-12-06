@@ -92,6 +92,16 @@ class Vector2D {
         return this;
     }
 
+    setInvalid(){
+        this.x = NaN;
+        this.y = NaN;
+        return this;
+    }
+
+    isValid(){
+        return !isNaN(this.x) && !isNaN(this.y);
+    }
+
     invert(){
         return this.mul(-1);
     }

@@ -91,7 +91,11 @@ function insertWanderGame(){
     }
 
     const update = function(){
-        this.vehicle.wander(this.context);
+        if (this.mousePos.isValid()){
+            this.vehicle.applyForce(this.vehicle.seek(this.mousePos));
+            this.vehicle.wanderDir = 0;
+        }
+        else this.vehicle.wander(this.context);
         this.vehicle.update(this.size);
     }
 
@@ -132,12 +136,11 @@ class Game {
 
     initEventListeners(){
         const self = this;
-        this.mousePos = new Vector2D(-1, -1);
-        this.mouseOver = false;
+        this.mousePos = new Vector2D().setInvalid();
 
         // Keep track of whether the mouse/touch is currently on the canvas:
-        this.canvas.addEventListener("mouseout", function(event){ self.mousePos.set(-1, -1); });
-        this.canvas.addEventListener("touchend", function(event){ self.mousePos.set(-1, -1); });
+        this.canvas.addEventListener("mouseout", function(event){ self.mousePos.setInvalid(); });
+        this.canvas.addEventListener("touchend", function(event){ self.mousePos.setInvalid(); });
 
         // Keep track of mouse/touch position:
         this.canvas.addEventListener("mousemove", function(event){ 

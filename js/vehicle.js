@@ -20,7 +20,7 @@ class Vehicle {
         this.radius = radius;
         this.borderBehaviour = borderBehaviour;
 
-        this.wanderDir = Math.PI / 2;
+        this.wanderDir = 0;
 
         this.pathPoints = [];
         this.pathLength = 0;
@@ -238,7 +238,7 @@ class Target extends Vehicle {
 
     update(canvasSize, mousePos){
         // If mouse on canvas, move target towards mouse pos:
-        if (mousePos.x != -1) this.vel = Vector2D.sub(mousePos, this.pos).mul(0.5);
+        if (mousePos.isValid()) this.vel = Vector2D.sub(mousePos, this.pos).mul(0.5);
         // Else make target travel at default velocity:
         else this.vel = this.defaultVel;
 
