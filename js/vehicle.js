@@ -160,17 +160,27 @@ class Vehicle {
             }
         }
         else { // wrap:
+            let wrapped = false;
             if (left >= canvasSize.x){
                 this.pos.setX(-this.radius);
+                wrapped = true;
             }
             else if (right <= 0){
-                this.pos.setX(canvasSize.x + this.radius)
+                this.pos.setX(canvasSize.x + this.radius);
+                wrapped = true;
             }
             if (top >= canvasSize.y){
                 this.pos.setY(-this.radius);
+                wrapped = true;
             }
             else if (bottom <= 0){
-                this.pos.setY(canvasSize.y + this.radius)
+                this.pos.setY(canvasSize.y + this.radius);
+                wrapped = true;
+            }
+
+            if (wrapped && this.pathLength > 0){
+                this.pathPoints.push(undefined);
+                while (this.pathPoints.length > this.pathLength) this.pathPoints.shift();   
             }
         }
     }
@@ -182,10 +192,23 @@ class Vehicle {
         this.acc.set(0, 0);
         if (this.borderBehaviour != Vehicle.BorderBehaviour.NONE) this.applyBorder(canvasSize);
 
-        this.pathPoints.push(this.pos.copy());
+        if (this.pathLength > 0){
+            this.pathPoints.push(this.pos.copy());
+            while (this.pathPoints.length > this.pathLength) this.pathPoints.shift();
+        }
     }
 
     draw(c){
+        if (this.pathLength > 0){
+            c.strokeStyle = "orange";
+            for (let i = 0; i < this.pathPoints.length-1; i++){
+                const p0 = this.pathPoints[i];
+                const p1 = this.pathPoints[i+1];
+                if (typeof p0 === "undefined" || typeof p1 === "undefined") continue;
+                line(c, p0.x, p0.y, p1.x, p1.y);
+            }
+        }
+
         c.translate(this.pos.x, this.pos.y);
         const dir = this.vel.direction()
         c.rotate(dir);

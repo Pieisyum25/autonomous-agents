@@ -87,6 +87,7 @@ function insertWanderGame(){
     const setup = function(){
         this.vehicle = new Vehicle(100, 100, 20, Vehicle.BorderBehaviour.WRAP);
         this.vehicle.setMaxSpeed(5);
+        this.vehicle.setPathLength(100);
     }
 
     const update = function(){
