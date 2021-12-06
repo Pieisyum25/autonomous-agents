@@ -19,6 +19,23 @@ class Vehicle {
         this.maxForce = 0.3;
         this.radius = radius;
         this.borderBehaviour = borderBehaviour;
+
+        this.wanderDir = Math.PI / 2;
+
+        this.pathPoints = [];
+        this.pathLength = 0;
+    }
+
+    setMaxSpeed(value){
+        this.maxSpeed = value;
+    }
+
+    setMaxForce(value){
+        this.maxForce = value;
+    }
+
+    setPathLength(length){
+        this.pathLength = length;
     }
 
     seek(targetPos, arrival = false){
@@ -72,6 +89,44 @@ class Vehicle {
         return this.seek(targetPos, true);
     }
 
+    wander(c){
+        // Small circle in front/centre:
+        const wanderPoint = this.vel.copy();
+        wanderPoint.setMag(this.radius * 8);
+        wanderPoint.add(this.pos);
+        c.fillStyle = "white";
+        c.strokeStyle = "transparent";
+        circle(c, wanderPoint.x, wanderPoint.y, this.radius / 2);
+
+        // Big outer circle and line to centre:
+        const wanderRadius = this.radius * 4;
+        c.fillStyle = "transparent";
+        c.strokeStyle = "white";
+        circle(c, wanderPoint.x, wanderPoint.y, wanderRadius);
+        line(c, this.pos.x, this.pos.y, wanderPoint.x, wanderPoint.y);
+
+        // Calculate the current angle along the outer circle, adjusting for vehicle's current direction:
+        const theta = this.wanderDir + this.vel.direction();
+
+        // Small coloured circle on the outer circle that vehicle will steer towards, and line to it:
+        const x = wanderRadius * Math.cos(theta);
+        const y = wanderRadius * Math.sin(theta);
+        wanderPoint.add(new Vector2D(x, y));
+        c.fillStyle = "yellow";
+        c.strokeStyle = "transparent";
+        circle(c, wanderPoint.x, wanderPoint.y, this.radius / 2);
+        c.strokeStyle = "white";
+        line(c, this.pos.x, this.pos.y, wanderPoint.x, wanderPoint.y);
+
+        // Steer towards coloured circle:
+        const steer = wanderPoint.sub(this.pos);
+        steer.setMag(this.maxForce);
+        this.applyForce(steer);
+
+        // Move coloured circle along outer circle by random displacement:
+        const displaceRange = 0.2;
+        this.wanderDir += rand(-displaceRange, displaceRange);
+    }
 
 
     applyForce(force){ this.acc.add(force); }
@@ -126,6 +181,8 @@ class Vehicle {
         this.pos.add(this.vel);
         this.acc.set(0, 0);
         if (this.borderBehaviour != Vehicle.BorderBehaviour.NONE) this.applyBorder(canvasSize);
+
+        this.pathPoints.push(this.pos.copy());
     }
 
     draw(c){

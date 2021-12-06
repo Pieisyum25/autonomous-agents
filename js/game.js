@@ -85,17 +85,17 @@ function insertArriveGame(){
 
 function insertWanderGame(){
     const setup = function(){
-        this.t = 0.0;
+        this.vehicle = new Vehicle(100, 100, 20, Vehicle.BorderBehaviour.WRAP);
+        this.vehicle.setMaxSpeed(5);
     }
 
     const update = function(){
-        this.t += 0.01;
+        this.vehicle.wander(this.context);
+        this.vehicle.update(this.size);
     }
 
     const draw = function(){
-        this.context.fillStyle = "white";
-        this.context.strokeStyle = "blue";
-        circle(this.context, this.size.x / 2, this.size.y * perlinNoise(this.t), 10);
+        this.vehicle.draw(this.context);
     }
 
     new Game(new Vector2D(500, 500), 50, setup, update, draw, "wander");

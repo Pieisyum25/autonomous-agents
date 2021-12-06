@@ -145,7 +145,8 @@ class Vector2D {
 
     unit(){
         const m = this.getMag();
-        return this.div(m)
+        if (m == 0.0) return this;
+        else return this.div(m);
     }
 
     projectionVector(vector){
