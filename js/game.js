@@ -107,6 +107,38 @@ function insertWanderGame(){
 }
 
 
+function insertFollowGame(){
+    const setup = function(){
+        this.vehicles = [];
+        for (let i = 1; i <= 3; i++){
+            this.vehicles.push(new Vehicle(150 * i, 150 * i, 20, Vehicle.BorderBehaviour.WRAP));
+            this.vehicles[i-1].setMaxSpeed(7);
+        }
+        const pathY = this.size.y / 2;
+        this.path = new Path(new Vector2D(0, pathY), new Vector2D(this.size.x, pathY), 20);
+    }
+
+    const update = function(){
+        if (this.mousePos.isValid()) this.path.end.y = this.mousePos.y;
+        this.context.lineCap = "round";
+        this.path.draw(this.context);
+
+        this.vehicles.forEach(vehicle => {
+            vehicle.applyForce(vehicle.follow(this.path, this.context));
+            vehicle.update(this.size);
+        });
+    }
+
+    const draw = function(){
+        this.vehicles.forEach(vehicle => {
+            vehicle.draw(this.context);
+        });
+    }
+
+    new Game(new Vector2D(500, 500), 50, setup, update, draw, "follow");
+}
+
+
 class Game {
 
     static count = 1;

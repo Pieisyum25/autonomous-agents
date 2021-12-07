@@ -128,6 +128,34 @@ class Vehicle {
         this.wanderDir += rand(-displaceRange, displaceRange);
     }
 
+    follow(path, c){
+        // Calculate future pos:
+        const future = this.vel.copy();
+        future.mul(10).add(this.pos);
+        
+        // Calculate projection point (normalPoint):
+        const normalPoint = future.projectionPoint(path.start, path.end);
+
+        // Calculate target (along path from normal point):
+        const progressSegment = Vector2D.sub(path.end, path.start).setMag(this.radius * 2); // determines direction
+        const target = Vector2D.add(normalPoint, progressSegment);
+
+        // Draw points:
+        c.strokeStyle = "white";
+        line(c, future.x, future.y, normalPoint.x, normalPoint.y);
+        c.fillStyle = "yellow";
+        c.strokeStyle = "transparent";
+        circle(c, future.x, future.y, this.radius / 2);
+        c.fillStyle = "white";
+        circle(c, normalPoint.x, normalPoint.y, this.radius / 4);
+        circle(c, target.x, target.y, this.radius / 2);
+
+        // Steer towards target if future pos is off the path
+        const dist = Vector2D.distance(future, normalPoint);
+        if (dist > path.radius) return this.seek(target);
+        return Vector2D.ZERO;
+    }
+
 
     applyForce(force){ this.acc.add(force); }
 

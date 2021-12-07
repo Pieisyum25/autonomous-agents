@@ -172,6 +172,13 @@ class Vector2D {
         return dotProduct / vMag;
     }
 
+    projectionPoint(origin, vector){
+        const va = Vector2D.sub(this, origin);
+        const vb = Vector2D.sub(vector, origin);
+        const sp = va.projectionScalar(vb);
+        return vb.setMag(sp).add(origin);
+    }
+
     direction(){ return Math.atan2(this.y, this.x); }
 
     copy(){ return new Vector2D(this.x, this.y); }
