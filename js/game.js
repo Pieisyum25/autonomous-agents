@@ -108,6 +108,11 @@ function insertWanderGame(){
 
 
 function insertFollowGame(){
+    insertSimpleFollowGame();
+    insertComplexFollowGame();
+}
+
+function insertSimpleFollowGame(){
     const setup = function(){
         this.vehicles = [];
         for (let i = 1; i <= 3; i++){
@@ -135,7 +140,23 @@ function insertFollowGame(){
         });
     }
 
-    new Game(new Vector2D(500, 500), 50, setup, update, draw, "follow");
+    new Game(new Vector2D(500, 500), 50, setup, update, draw, "simple-follow");
+}
+
+function insertComplexFollowGame(){
+    const setup = function(){
+        this.path = new CurvePath([new Vector2D(100, 100), new Vector2D(400, 100), new Vector2D(400, 400), new Vector2D(100, 400)], 20, true);
+    }
+
+    const update = function(){
+        
+    }
+
+    const draw = function(){
+        this.path.draw(this.context);
+    }
+
+    new Game(new Vector2D(500, 500), 50, setup, update, draw, "complex-follow");
 }
 
 

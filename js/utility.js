@@ -10,6 +10,15 @@ function line(context, x0, y0, x1, y1){
     }
 }
 
+function bezierCurve(context, p0, p1, p2, p3){
+    with (context){
+        beginPath();
+        moveTo(p0.x, p0.y);
+        bezierCurveTo(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
+        stroke();
+    }
+}
+
 function rectangle(context, left, top, width, height){
     with (context){
         fillRect(left, top, width, height);
