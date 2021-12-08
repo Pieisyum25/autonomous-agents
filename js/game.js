@@ -145,7 +145,7 @@ function insertSimpleFollowGame(){
 
 function insertComplexFollowGame(){
     const setup = function(){
-        this.path = new CurvePath([new Vector2D(100, 100), new Vector2D(400, 100), new Vector2D(400, 400), new Vector2D(100, 400)], 20, true);
+        this.path = new CurvedPath([new Vector2D(100, 100), new Vector2D(400, 100), new Vector2D(400, 400), new Vector2D(100, 400)], 20, true);
     }
 
     const update = function(){

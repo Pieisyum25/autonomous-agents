@@ -26,7 +26,7 @@ class Path {
  * Conversion formula adapted from: https://arxiv.org/pdf/2011.08232.pdf
  * Requires at least 4 control points!!!
  */
-class CurvePath {
+class CurvedPath {
 
     constructor(points, radius, looping = false, tension = 1.0){
         this.points = points;
