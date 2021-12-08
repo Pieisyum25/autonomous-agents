@@ -65,6 +65,7 @@ main {
     background-color: #500000;
     margin: 50px auto 100px;
     max-width: 60%;
+    min-width: 600px;
     display: block;
     overflow: auto;
     padding: 50px 5% 100px;
