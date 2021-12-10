@@ -145,7 +145,8 @@ function insertSimpleFollowGame(){
 
 function insertComplexFollowGame(){
     const setup = function(){
-        this.path = new CurvedPath([new Vector2D(100, 100), new Vector2D(400, 100), new Vector2D(400, 400), new Vector2D(100, 400)], 20, true);
+        //this.path = new CurvedPath([new Vector2D(100, 100), new Vector2D(400, 100), new Vector2D(400, 400), new Vector2D(100, 400)], 20, true);
+        this.curve = new CatmullRomCurve(new Vector2D(100, 100), new Vector2D(400, 100), new Vector2D(400, 400), new Vector2D(100, 400));
     }
 
     const update = function(){
@@ -153,7 +154,8 @@ function insertComplexFollowGame(){
     }
 
     const draw = function(){
-        this.path.draw(this.context);
+        //this.path.draw(this.context);
+        this.curve.draw(this.context);
     }
 
     new Game(new Vector2D(500, 500), 50, setup, update, draw, "complex-follow");

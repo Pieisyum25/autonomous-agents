@@ -196,16 +196,18 @@ class Vector2D {
 
     static add(a, b){ return new Vector2D(a.x + b.x, a.y + b.y); }
     static sub(a, b){ return new Vector2D(a.x - b.x, a.y - b.y); }
-    static mul(a, b){ return new Vector2D(a.x * b, a.y * b); }
-    static div(a, b){ 
-        const reciprocal = 1 / b;
-        return Vector2D.mul(a, reciprocal);
+    static mul(vector, scalar){ return new Vector2D(vector.x * scalar, vector.y * scalar); }
+    static div(vector, scalar){ 
+        const reciprocal = 1 / scalar;
+        return Vector2D.mul(vector, reciprocal);
     }
 
     static distanceSquared(a, b){ return Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2); }
     static distance(a, b){ return Math.sqrt(this.distanceSquared(a, b)); }
 
     static dotProduct(a, b){ return ((a.x * b.x) + (a.y * b.y)); }
+
+    static midpoint(a, b){ return Vector2D.add(a, b).div(2); }
 
     static get ZERO(){ return ZERO; }
 
