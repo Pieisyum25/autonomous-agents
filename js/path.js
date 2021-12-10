@@ -28,7 +28,11 @@ class Path {
  */
 class CurvedPath {
 
-    constructor(points, radius, looping = false, tension = 1.0){
+    /** 
+     * Looping determines if the start and end points should connect.
+     * Tension should be between 0.0 and 1.0.
+     */
+    constructor(points, radius, looping = false, tension = 0.75){
         this.points = points;
         this.radius = radius;
         this.looping = looping;
