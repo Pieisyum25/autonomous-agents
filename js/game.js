@@ -155,7 +155,15 @@ function insertComplexFollowGame(){
 
     const draw = function(){
         //this.path.draw(this.context);
+        this.context.strokeStyle = "white";
         this.curve.draw(this.context);
+
+        if (this.mousePos.isValid()){
+            const t = this.curve.projectionScalar(this.mousePos);
+            const p = this.curve.interpolate(t);
+            this.context.fillStyle = "white";
+            circle(this.context, p.x, p.y, 10);
+        }
     }
 
     new Game(new Vector2D(500, 500), 50, setup, update, draw, "complex-follow");

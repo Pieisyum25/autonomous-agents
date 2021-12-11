@@ -20,25 +20,82 @@ class Path {
     }
 }
 
-/**
- * Path following Catmull-Rom curves.
- * Converts the Catmull-Rom control points to Bezier control points before drawing with the Bezier function.
- * Conversion formula adapted from: https://arxiv.org/pdf/2011.08232.pdf
- * Requires at least 4 control points!!!
- */
+// /**
+//  * Path following Catmull-Rom curves.
+//  * Converts the Catmull-Rom control points to Bezier control points before drawing with the Bezier function.
+//  * Conversion formula adapted from: https://arxiv.org/pdf/2011.08232.pdf
+//  * Requires at least 4 control points!!!
+//  */
+// class CurvedPath {
+
+//     /** 
+//      * Looping determines if the start and end points should connect.
+//      * Tension should be between 0.0 and 1.0.
+//      */
+//     constructor(points, radius, looping = false){
+//         this.points = points;
+//         this.radius = radius;
+//         this.looping = looping;
+
+//         // Conversion from Catmull-Rom control points to Bezier control points:
+//         this.bezierCurves = [];
+
+//         let startingCurveIndex = 0;
+//         let totalCurves = points.length;
+//         if (!looping){
+//             startingCurveIndex = points.length-1;
+//             totalCurves--;
+//         }
+
+//         let count = 0;
+//         let i = startingCurveIndex;
+//         while (count < totalCurves){
+//             const p = [];
+//             for (let j = 0; j < 4; j++) p.push(points[(i + j) % points.length]);
+
+//             const bezierPoints = [];
+//             bezierPoints.push(p[1]);
+//             bezierPoints.push(Vector2D.add(p[1], Vector2D.sub(p[2], p[0]).div(6 * tension)));
+//             bezierPoints.push(Vector2D.sub(p[2], Vector2D.sub(p[3], p[1]).div(6 * tension)));
+//             bezierPoints.push(p[2]);
+
+//             this.bezierCurves.push(bezierPoints);
+//             i++;
+//             i %= points.length;
+//             count++;
+//         }
+//     }
+
+//     draw(c){
+//         // Bezier curves:
+//         this.bezierCurves.forEach(p => {
+//             c.lineWidth = this.radius * 2;
+//             c.strokeStyle = "maroon";
+//             bezierCurve(c, p[0], p[1], p[2], p[3]);
+    
+//             c.lineWidth = 5;
+//             c.strokeStyle = "white";
+//             bezierCurve(c, p[0], p[1], p[2], p[3]);
+//         });
+
+//         c.lineWidth = 1;
+
+//         // Squares on Catmull-Rom control points:
+//         this.points.forEach(p => {
+//             c.fillStyle = "white";
+//             rectangle(c, p.x - this.radius / 2, p.y - this.radius / 2, this.radius, this.radius);
+//         });
+//     }
+// }
+
+
 class CurvedPath {
 
-    /** 
-     * Looping determines if the start and end points should connect.
-     * Tension should be between 0.0 and 1.0.
-     */
-    constructor(points, radius, looping = false, tension = 0.75){
+
+    constructor(points, radius, looping = false){
         this.points = points;
         this.radius = radius;
         this.looping = looping;
-
-        // Conversion from Catmull-Rom control points to Bezier control points:
-        this.bezierCurves = [];
 
         let startingCurveIndex = 0;
         let totalCurves = points.length;
@@ -96,7 +153,7 @@ class CatmullRomCurve {
         CHORDAL: 1.0
     }
 
-    constructor(p0, p1, p2, p3, tension = 0.0, alpha = CatmullRomCurve.Parameterization.CENTRIPETAL, maxLineOffset = 0.5){
+    constructor(p0, p1, p2, p3, tension = 0.0, alpha = CatmullRomCurve.Parameterization.CENTRIPETAL, maxLineOffset = 0.2){
         this.p = [p0, p1, p2, p3];
         this.tension = tension;
         this.alpha = alpha;
@@ -125,7 +182,11 @@ class CatmullRomCurve {
 
         // Determine which points/vertices to draw line segments between:
         this.determineSegments();
-        console.log(this.vertices.length);
+
+        // Determine the depth when binary searching for the closest t value:
+        this.curveLength = this.calculateLength();
+        this.searchDepth = Math.ceil(this.curveLength / 15);
+        console.log(this.searchDepth)
     }
 
     determineSegments(){
@@ -154,16 +215,44 @@ class CatmullRomCurve {
         }
     }
 
+    calculateLength(){
+        let lengthSquared = 0.0;
+        for (let i = 0; i < this.vertices.length - 1; i++){
+            const p0 = this.vertices[i].pos;
+            const p1 = this.vertices[i+1].pos;
+            lengthSquared += Vector2D.distanceSquared(p0, p1);
+        }
+        return Math.sqrt(lengthSquared);
+    }
+
     interpolate(t){
         return Vector2D.mul(this.a, t*t*t).add(Vector2D.mul(this.b, t*t)).add(Vector2D.mul(this.c, t)).add(this.d);
     }
 
-    draw(c){
-        // c.fillStyle = "yellow";
-        // c.strokeStyle = "transparent";
-        // this.p.forEach(p => circle(c, p.x, p.y, 10));
+    projectionScalar(p){
+        return this.findT(p, 0.0, 1.0, this.searchDepth);
+    }
 
-        c.strokeStyle = "white";
+    findT(p, startT, endT, depthRemaining){
+        const quarterDeltaT = (endT - startT) / 4;
+        const quarterT = startT + quarterDeltaT;
+        const halfT = quarterT + quarterDeltaT;
+        const threeQuartersT = halfT + quarterDeltaT;
+
+        const quarterP = this.interpolate(quarterT);
+        const threeQuartersP = this.interpolate(threeQuartersT);
+
+        if (Vector2D.distanceSquared(p, quarterP) <= Vector2D.distanceSquared(p, threeQuartersP)){
+            if (depthRemaining <= 1) return quarterT;
+            return this.findT(p, startT, halfT, depthRemaining - 1);
+        }
+        else {
+            if (depthRemaining <= 1) return threeQuartersT;
+            return this.findT(p, halfT, endT, depthRemaining - 1);
+        }
+    }
+
+    draw(c){
         for (let i = 0; i < this.vertices.length - 1; i++){
             const p0 = this.vertices[i].pos;
             const p1 = this.vertices[i+1].pos;
