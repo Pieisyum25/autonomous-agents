@@ -75,6 +75,9 @@ function rand(min, max){
     return (Math.random() * (max - min)) + min;
 }
 
+function randInt(min, max){
+    return Math.floor(rand(min, max));
+}
 
 // Vector2D:
 
@@ -209,7 +212,10 @@ class Vector2D {
 
     static midpoint(a, b){ return Vector2D.add(a, b).div(2); }
 
+    static rand(minX, maxX, minY, maxY){ return new Vector2D(rand(minX, maxX), rand(minY, maxY)); }
+
     static get ZERO(){ return ZERO; }
+    static get INVALID(){ return INVALID; }
 
 }
 

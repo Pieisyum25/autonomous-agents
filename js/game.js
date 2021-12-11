@@ -145,22 +145,29 @@ function insertSimpleFollowGame(){
 
 function insertComplexFollowGame(){
     const setup = function(){
-        this.path = new ComplexPath([new Vector2D(400, 100), new Vector2D(100, 100), new Vector2D(100, 250), new Vector2D(400, 250), new Vector2D(400, 400), new Vector2D(100, 400)], 20, false);
+        const points = [];
+        const n = randInt(4, 9);
+        for (let i = 0; i < n; i++) points.push(Vector2D.rand(50, 450, 50, 450));
+        //this.path = new ComplexPath([new Vector2D(400, 100), new Vector2D(100, 100), new Vector2D(100, 250), new Vector2D(400, 250), new Vector2D(400, 400), new Vector2D(100, 400)], 20, false);
+        this.path = new ComplexPath(points, 20, false);
+        this.vehicles = [];
+        this.vehicles.push(new Vehicle(0, 0, 20));
+        this.vehicles.push(new Vehicle(500, 500, 20));
+        this.vehicles.forEach(vehicle => vehicle.setMaxSpeed(7));
     }
 
     const update = function(){
-        
+        this.path.draw(this.context);
+
+        this.vehicles.forEach(vehicle => {
+            if (this.mousePos.isValid()) vehicle.applyForce(vehicle.seek(this.mousePos));
+            else vehicle.applyForce(vehicle.follow(this.path, this.context));
+            vehicle.update(this.size);
+        });
     }
 
     const draw = function(){
-        this.path.draw(this.context);
-
-        if (this.mousePos.isValid()){
-            const t = this.path.projectionScalar(this.mousePos);
-            const p = this.path.interpolate(t);
-            this.context.fillStyle = "white";
-            circle(this.context, p.x, p.y, 10);
-        }
+        this.vehicles.forEach(vehicle => vehicle.draw(this.context));
     }
 
     new Game(new Vector2D(500, 500), 50, setup, update, draw, "complex-follow");

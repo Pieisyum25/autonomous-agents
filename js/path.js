@@ -94,7 +94,6 @@ class Path {
  */
 class ComplexPath {
 
-
     constructor(points, radius, looping = false, tension = 0.0){
         this.radius = radius;
 

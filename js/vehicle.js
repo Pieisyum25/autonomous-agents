@@ -129,6 +129,11 @@ class Vehicle {
     }
 
     follow(path, c){
+        if (path instanceof Path) return this.simpleFollow(path, c);
+        else if (path instanceof ComplexPath) return this.complexFollow(path, c);
+    }
+
+    simpleFollow(path, c){
         // Calculate future pos:
         const future = this.vel.copy();
         future.mul(10).add(this.pos);
@@ -153,6 +158,35 @@ class Vehicle {
         // Steer towards target if future pos is off the path
         const dist = Vector2D.distance(future, normalPoint);
         if (dist > path.radius) return this.seek(target);
+        return Vector2D.ZERO;
+    }
+
+    complexFollow(path, c){
+        // Calculate future pos:
+        const future = this.vel.copy();
+        future.mul(10).add(this.pos);
+        
+        // Calculate projection point (normalPoint):
+        const normalPoint = path.interpolate(path.projectionScalar(future));
+
+        // Calculate target (along path from normal point):
+        //const progressSegment = Vector2D.sub(path.end, path.start).setMag(this.radius * 2); // determines direction
+        //const target = Vector2D.add(normalPoint, progressSegment);
+
+        // Draw points:
+        c.strokeStyle = "white";
+        line(c, future.x, future.y, normalPoint.x, normalPoint.y);
+        c.fillStyle = "yellow";
+        c.strokeStyle = "transparent";
+        circle(c, future.x, future.y, this.radius / 2);
+        c.fillStyle = "white";
+        circle(c, normalPoint.x, normalPoint.y, this.radius / 4);
+        //circle(c, target.x, target.y, this.radius / 2);
+
+        // Steer towards target if future pos is off the path
+        const dist = Vector2D.distance(future, normalPoint);
+        //if (dist > path.radius) return this.seek(target);
+        if (dist > path.radius) return this.seek(normalPoint);
         return Vector2D.ZERO;
     }
 
