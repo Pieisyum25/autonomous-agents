@@ -89,59 +89,95 @@ class Path {
 // }
 
 
-class CurvedPath {
+/**
+ * Heavy inspiration from: https://qroph.github.io/2018/07/30/smooth-paths-using-catmull-rom-splines.html
+ */
+class ComplexPath {
 
 
-    constructor(points, radius, looping = false){
-        this.points = points;
+    constructor(points, radius, looping = false, tension = 0.0){
         this.radius = radius;
-        this.looping = looping;
 
-        let startingCurveIndex = 0;
-        let totalCurves = points.length;
-        if (!looping){
-            startingCurveIndex = points.length-1;
-            totalCurves--;
+        const pCopy = points.slice();
+        const n = points.length;
+
+        if (looping){
+            pCopy.push(points[0]);
+            pCopy.push(points[1]);
+            pCopy.splice(0, 0, points[n - 1])
+        }
+        else {
+            const first = Vector2D.mul(points[0], 2).sub(points[1]);
+            const last = Vector2D.mul(points[n - 1], 2).sub(points[n - 2]);
+            pCopy.splice(0, 0, first);
+            pCopy.push(last);
         }
 
-        let count = 0;
-        let i = startingCurveIndex;
-        while (count < totalCurves){
-            const p = [];
-            for (let j = 0; j < 4; j++) p.push(points[(i + j) % points.length]);
-
-            const bezierPoints = [];
-            bezierPoints.push(p[1]);
-            bezierPoints.push(Vector2D.add(p[1], Vector2D.sub(p[2], p[0]).div(6 * tension)));
-            bezierPoints.push(Vector2D.sub(p[2], Vector2D.sub(p[3], p[1]).div(6 * tension)));
-            bezierPoints.push(p[2]);
-
-            this.bezierCurves.push(bezierPoints);
-            i++;
-            i %= points.length;
-            count++;
+        // Create curves and measure their start lengths (length of the path before that specific curve starts):
+        this.curves = [];
+        this.startLengths = new Map();
+        this.totalLength = 0.0;
+        for (let i = 1; i < pCopy.length - 2; i++) {
+            const curve = new CatmullRomCurve(pCopy[i-1], pCopy[i], pCopy[i+1], pCopy[i+2], tension);
+            this.curves.push(curve);
+            this.startLengths.set(curve, this.totalLength);
+            this.totalLength += curve.curveLength;
         }
     }
 
-    draw(c){
-        // Bezier curves:
-        this.bezierCurves.forEach(p => {
-            c.lineWidth = this.radius * 2;
-            c.strokeStyle = "maroon";
-            bezierCurve(c, p[0], p[1], p[2], p[3]);
-    
-            c.lineWidth = 5;
-            c.strokeStyle = "white";
-            bezierCurve(c, p[0], p[1], p[2], p[3]);
+    projectionScalar(p){
+        let closestCurve = this.curves[0];
+        let closestT = 0.0;
+        let closestDist = Number.MAX_VALUE;
+
+        this.curves.forEach(curve => {
+            const t = curve.projectionScalar(p);
+            const point = curve.interpolate(t);
+            const dist = Vector2D.distanceSquared(p, point);
+
+            if (dist < closestDist){
+                closestDist = dist;
+                closestT = t;
+                closestCurve = curve;
+            }
         });
+
+        // Determine the t value along the entire path:
+        const currentLength = this.startLengths.get(closestCurve) + (closestCurve.curveLength * closestT);
+        const t = currentLength / this.totalLength;
+
+        return t;
+    }
+
+    interpolate(t){
+        const currentLength = t * this.totalLength;
+        let currentCurve = this.curves[0];
+
+        this.curves.find(curve => {
+            const startLength = this.startLengths.get(curve);
+            if (startLength <= currentLength){
+                currentCurve = curve;
+                return false;
+            }
+            return true;
+        });
+
+        const curveT = (currentLength - this.startLengths.get(currentCurve)) / currentCurve.curveLength;
+        return currentCurve.interpolate(curveT);
+    }
+
+    draw(c){
+        c.lineCap = "round";
+
+        c.lineWidth = this.radius * 2;
+        c.strokeStyle = "maroon";
+        this.curves.forEach(curve => curve.draw(c));
+
+        c.lineWidth = 5;
+        c.strokeStyle = "white";
+        this.curves.forEach(curve => curve.draw(c));
 
         c.lineWidth = 1;
-
-        // Squares on Catmull-Rom control points:
-        this.points.forEach(p => {
-            c.fillStyle = "white";
-            rectangle(c, p.x - this.radius / 2, p.y - this.radius / 2, this.radius, this.radius);
-        });
     }
 }
 
@@ -185,18 +221,17 @@ class CatmullRomCurve {
 
         // Determine the depth when binary searching for the closest t value:
         this.curveLength = this.calculateLength();
-        this.searchDepth = Math.ceil(this.curveLength / 15);
-        console.log(this.searchDepth)
+        this.searchDepth = Math.ceil(this.curveLength / 30 + 4);
     }
 
     determineSegments(){
         this.vertices = [];
         this.vertices.push({ pos: this.p[1], t: 0.0 });
         this.vertices.push({ pos: this.p[2], t: 1.0 });
-        this.evaluateSegment(this.vertices[0], this.vertices[1]);
+        this.evaluateSegment(this.vertices[0], this.vertices[1], 1);
     }
 
-    evaluateSegment(startVertex, endVertex){
+    evaluateSegment(startVertex, endVertex, depth){
         const midpointPos = Vector2D.midpoint(startVertex.pos, endVertex.pos);
         const midpointT = (startVertex.t + endVertex.t) / 2;
         const actualPos = this.interpolate(midpointT);
@@ -205,13 +240,13 @@ class CatmullRomCurve {
         // into two, add the new vertex, and call this method recursively on each of the new segments:
         const offset = Vector2D.distanceSquared(midpointPos, actualPos);
 
-        if (offset > Math.pow(this.maxLineOffset, 2)){
+        if (depth < 2 || offset > Math.pow(this.maxLineOffset, 2)){
             const midpointIndex = this.vertices.indexOf(startVertex) + 1;
             const midpointVertex = { pos: actualPos, t: midpointT };
             this.vertices.splice(midpointIndex, 0, midpointVertex);
 
-            this.evaluateSegment(startVertex, midpointVertex);
-            this.evaluateSegment(midpointVertex, endVertex);
+            this.evaluateSegment(startVertex, midpointVertex, depth + 1);
+            this.evaluateSegment(midpointVertex, endVertex, depth + 1);
         }
     }
 

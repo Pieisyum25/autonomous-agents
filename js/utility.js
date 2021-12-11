@@ -80,7 +80,7 @@ function rand(min, max){
 
 class Vector2D {
 
-    constructor(x, y){
+    constructor(x = 0.0, y = 0.0){
         this.x = x;
         this.y = y;
     }
@@ -214,3 +214,4 @@ class Vector2D {
 }
 
 const ZERO = new Vector2D(0, 0);
+const INVALID = new Vector2D(NaN, NaN);
