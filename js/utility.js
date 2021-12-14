@@ -210,9 +210,12 @@ class Vector2D {
 
     static dotProduct(a, b){ return ((a.x * b.x) + (a.y * b.y)); }
 
+    static fromAngle(rads, mag = 1.0){ return new Vector2D(mag * Math.cos(rads), mag * Math.sin(rads)); }
+
     static midpoint(a, b){ return Vector2D.add(a, b).div(2); }
 
-    static rand(minX, maxX, minY, maxY){ return new Vector2D(rand(minX, maxX), rand(minY, maxY)); }
+    static randomRange(minX, maxX, minY, maxY){ return new Vector2D(rand(minX, maxX), rand(minY, maxY)); }
+    static randomDirection(minAngle = 0, maxAngle = (2 * Math.PI), mag = 1.0){ return Vector2D.fromAngle(rand(minAngle, maxAngle), mag); }
 
     static get ZERO(){ return ZERO; }
     static get INVALID(){ return INVALID; }

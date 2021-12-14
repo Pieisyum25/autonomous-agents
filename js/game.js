@@ -147,7 +147,7 @@ function insertComplexFollowGame(){
     const setup = function(){
         const points = [];
         const n = randInt(4, 9);
-        for (let i = 0; i < n; i++) points.push(Vector2D.rand(50, 450, 50, 450));
+        for (let i = 0; i < n; i++) points.push(Vector2D.randomRange(50, 450, 50, 450));
         //this.path = new ComplexPath([new Vector2D(400, 100), new Vector2D(100, 100), new Vector2D(100, 250), new Vector2D(400, 250), new Vector2D(400, 400), new Vector2D(100, 400)], 20, false);
         this.path = new ComplexPath(points, 20, true);
         this.vehicles = [];
@@ -176,16 +176,24 @@ function insertComplexFollowGame(){
 
 function insertBoidsGame(){
     const setup = function(){
-        this.vehicle = new Vehicle(100, 100, 20, Vehicle.BorderBehaviour.BOUNCE);
+        this.boids = [];
+        for (let i = 0; i < 50; i++){
+            const boid = new Vehicle(rand(0, this.size.x), rand(0, this.size.y), 10, Vehicle.BorderBehaviour.WRAP);
+            boid.setVelocity(Vector2D.randomDirection().mul(5));
+            boid.setMaxSpeed(5);
+            this.boids.push(boid);
+        }
     }
 
     const update = function(){
-        if (this.mousePos.isValid()) this.vehicle.applyForce(this.vehicle.seek(this.mousePos));
-        this.vehicle.update(this.size);
+        for (let boid of this.boids){
+            boid.flock(this.boids);
+            boid.update(this.size);
+        }
     }
 
     const draw = function(){
-        this.vehicle.draw(this.context);
+        for (let boid of this.boids) boid.draw(this.context);
     }
 
     new Game(new Vector2D(500, 500), 50, setup, update, draw, "boids");

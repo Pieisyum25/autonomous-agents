@@ -26,17 +26,12 @@ class Vehicle {
         this.pathLength = 0;
     }
 
-    setMaxSpeed(value){
-        this.maxSpeed = value;
-    }
-
-    setMaxForce(value){
-        this.maxForce = value;
-    }
-
-    setPathLength(length){
-        this.pathLength = length;
-    }
+    setPosition(pos){ this.pos = pos; }
+    setVelocity(vel){ this.vel = vel; }
+    setAcceleration(acc){ this.acc = acc; }
+    setMaxSpeed(speed){ this.maxSpeed = speed; }
+    setMaxForce(force){ this.maxForce = force; }
+    setPathLength(length){ this.pathLength = length; }
 
     seek(targetPos, arrival = false){
         const force = Vector2D.sub(targetPos, this.pos);
@@ -188,6 +183,30 @@ class Vehicle {
         //if (dist > path.radius) return this.seek(target);
         if (dist > path.radius) return this.seek(normalPoint);
         return Vector2D.ZERO;
+    }
+
+
+    flock(boids, perceptionRadius = 100){
+        const perceptionSquared = Math.pow(perceptionRadius, 2);
+        const localBoids = boids.filter(boid => (Vector2D.distanceSquared(this.pos, boid.pos) <= perceptionSquared && this != boid));
+
+        this.applyForce(this.align(localBoids));
+    }
+
+    align(localBoids){
+        const avg = new Vector2D();
+        let count = 0;
+
+        for (let boid of localBoids){
+            avg.add(boid.vel);
+            count++;
+        }
+        if (count > 0){
+            avg.div(count);
+            avg.sub(this.vel);
+        }
+
+        return avg;
     }
 
 
