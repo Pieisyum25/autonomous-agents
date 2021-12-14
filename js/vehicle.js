@@ -186,11 +186,15 @@ class Vehicle {
     }
 
 
+    /** Inspired by: https://github.com/CodingTrain/website/blob/main/CodingChallenges/CC_124_Flocking_Boids/P5/boid.js */
     flock(boids, perceptionRadius = 50){
         const perceptionSquared = Math.pow(perceptionRadius, 2);
         const localBoids = boids.filter(boid => (Vector2D.distanceSquared(this.pos, boid.pos) <= perceptionSquared && this != boid));
 
-        const force = Vector2D.add(this.alignment(localBoids), this.separation(localBoids), this.cohesion(localBoids));
+        const alignment = this.alignment(localBoids);
+        const separation = this.separation(localBoids);
+        const cohesion = this.cohesion(localBoids);
+        const force = Vector2D.add(alignment, separation, cohesion);
         this.applyForce(force.limitMag(this.maxForce));
     }
 
@@ -234,11 +238,14 @@ class Vehicle {
     separation(localBoids){
         const steering = new Vector2D();
         let count = 0;
+        let colliding = false;
+
 
         for (let boid of localBoids){
             const diff = Vector2D.sub(this.pos, boid.pos);
             const distSquared = Vector2D.distanceSquared(this.pos, boid.pos);
             diff.div(distSquared);
+            if (distSquared < this.radius) colliding = true; // prevent overlap of boids
             steering.add(diff);
             count++;
         }
@@ -246,7 +253,7 @@ class Vehicle {
             steering.div(count);
             steering.setMag(this.maxSpeed);
             steering.sub(this.vel);
-            steering.limitMag(this.maxForce);
+            if (!colliding) steering.limitMag(this.maxForce);
         }
 
         return steering;

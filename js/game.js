@@ -188,7 +188,8 @@ function insertBoidsGame(){
 
     const update = function(){
         for (let boid of this.boids){
-            boid.flock(this.boids, 100);
+            if (this.mousePos.isValid()) boid.applyForce(boid.seek(this.mousePos));
+            else boid.flock(this.boids, 100);
             boid.update(this.size);
         }
     }
