@@ -177,17 +177,18 @@ function insertComplexFollowGame(){
 function insertBoidsGame(){
     const setup = function(){
         this.boids = [];
-        for (let i = 0; i < 50; i++){
+        for (let i = 0; i < 75; i++){
             const boid = new Vehicle(rand(0, this.size.x), rand(0, this.size.y), 10, Vehicle.BorderBehaviour.WRAP);
-            boid.setVelocity(Vector2D.randomDirection().mul(5));
-            boid.setMaxSpeed(5);
+            boid.setVelocity(Vector2D.randomDirection().mul(rand(2, 4)));
+            boid.setMaxForce(1);
+            boid.setMaxSpeed(4);
             this.boids.push(boid);
         }
     }
 
     const update = function(){
         for (let boid of this.boids){
-            boid.flock(this.boids);
+            boid.flock(this.boids, 100);
             boid.update(this.size);
         }
     }

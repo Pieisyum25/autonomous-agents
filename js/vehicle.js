@@ -186,27 +186,70 @@ class Vehicle {
     }
 
 
-    flock(boids, perceptionRadius = 100){
+    flock(boids, perceptionRadius = 50){
         const perceptionSquared = Math.pow(perceptionRadius, 2);
         const localBoids = boids.filter(boid => (Vector2D.distanceSquared(this.pos, boid.pos) <= perceptionSquared && this != boid));
 
-        this.applyForce(this.align(localBoids));
+        const force = Vector2D.add(this.alignment(localBoids), this.separation(localBoids), this.cohesion(localBoids));
+        this.applyForce(force.limitMag(this.maxForce));
     }
 
-    align(localBoids){
-        const avg = new Vector2D();
+    alignment(localBoids){
+        const steering = new Vector2D();
         let count = 0;
 
         for (let boid of localBoids){
-            avg.add(boid.vel);
+            steering.add(boid.vel);
             count++;
         }
         if (count > 0){
-            avg.div(count);
-            avg.sub(this.vel);
+            steering.div(count);
+            steering.setMag(this.maxSpeed);
+            steering.sub(this.vel);
+            steering.limitMag(this.maxForce);
         }
 
-        return avg;
+        return steering;
+    }
+
+    cohesion(localBoids){
+        const steering = new Vector2D();
+        let count = 0;
+
+        for (let boid of localBoids){
+            steering.add(boid.pos);
+            count++;
+        }
+        if (count > 0){
+            steering.div(count);
+            steering.sub(this.pos);
+            steering.setMag(this.maxSpeed);
+            steering.sub(this.vel);
+            steering.limitMag(this.maxForce);
+        }
+
+        return steering;
+    }
+
+    separation(localBoids){
+        const steering = new Vector2D();
+        let count = 0;
+
+        for (let boid of localBoids){
+            const diff = Vector2D.sub(this.pos, boid.pos);
+            const distSquared = Vector2D.distanceSquared(this.pos, boid.pos);
+            diff.div(distSquared);
+            steering.add(diff);
+            count++;
+        }
+        if (count > 0){
+            steering.div(count);
+            steering.setMag(this.maxSpeed);
+            steering.sub(this.vel);
+            steering.limitMag(this.maxForce);
+        }
+
+        return steering;
     }
 
 

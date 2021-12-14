@@ -151,7 +151,8 @@ class Vector2D {
         return this.mul(reciprocal);
     }
 
-    getMag(){ return Math.sqrt((this.x * this.x) + (this.y * this.y)); }
+    getMag(){ return Math.sqrt(this.getMagSquared()); }
+    getMagSquared(){ return (this.x * this.x) + (this.y * this.y); }
 
     setMag(m){ 
         this.unit();
@@ -197,7 +198,11 @@ class Vector2D {
 
     toString(){ return "(" + this.x + ", " + this.y + ")"; }
 
-    static add(a, b){ return new Vector2D(a.x + b.x, a.y + b.y); }
+    static add(){
+        const sum = new Vector2D();
+        for (let arg of arguments) sum.add(arg);
+        return sum;
+    }
     static sub(a, b){ return new Vector2D(a.x - b.x, a.y - b.y); }
     static mul(vector, scalar){ return new Vector2D(vector.x * scalar, vector.y * scalar); }
     static div(vector, scalar){ 
