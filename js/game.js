@@ -145,11 +145,16 @@ function insertSimpleFollowGame(){
 
 function insertComplexFollowGame(){
     const setup = function(){
-        const points = [];
-        const n = randInt(4, 9);
-        for (let i = 0; i < n; i++) points.push(Vector2D.randomRange(50, 450, 50, 450));
-        //this.path = new ComplexPath([new Vector2D(400, 100), new Vector2D(100, 100), new Vector2D(100, 250), new Vector2D(400, 250), new Vector2D(400, 400), new Vector2D(100, 400)], 20, false);
-        this.path = new ComplexPath(points, 20, true);
+        
+        // Zig-zag path:
+        this.path = new ComplexPath([new Vector2D(400, 100), new Vector2D(100, 100), new Vector2D(100, 250), new Vector2D(400, 250), new Vector2D(400, 400), new Vector2D(100, 400)], 20, true);
+        
+        // Random loop:
+        // const points = [];
+        // const n = randInt(4, 9);
+        // for (let i = 0; i < n; i++) points.push(Vector2D.randomRange(50, 450, 50, 450));
+        // this.path = new ComplexPath(points, 20, true);
+
         this.vehicles = [];
         this.vehicles.push(new Vehicle(0, 0, 20));
         this.vehicles.push(new Vehicle(500, 500, 20));
