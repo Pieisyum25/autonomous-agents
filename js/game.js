@@ -231,7 +231,7 @@ class Game {
         this.setup();
         
         // Set frame rate:
-        this.interval = setInterval(function(){ self.tick(self) }, 1000 / fps);        
+        if (fps > 0) this.interval = setInterval(function(){ self.tick(self) }, 1000 / fps);        
     }
 
     initEventListeners(){
@@ -241,6 +241,7 @@ class Game {
         // Keep track of whether the mouse/touch is currently on the canvas:
         this.canvas.addEventListener("mouseout", function(event){ self.mousePos.setInvalid(); });
         this.canvas.addEventListener("touchend", function(event){ self.mousePos.setInvalid(); });
+        this.canvas.addEventListener("touchcancel", function(event){ self.mousePos.setInvalid(); });
 
         // Keep track of mouse/touch position:
         this.canvas.addEventListener("mousemove", function(event){ 
